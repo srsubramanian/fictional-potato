@@ -88,6 +88,28 @@ task_id = await queue.submit(
 result = await queue.get_result(task_id)
 ```
 
+## Cloud Architecture
+
+The diagram below shows how AgentFlow maps onto AWS infrastructure:
+
+```mermaid
+architecture-beta
+    group api(cloud)[API Layer]
+    group compute(cloud)[Compute]
+    group storage(cloud)[Storage]
+
+    service gateway(aws:amazon-api-gateway)[API Gateway] in api
+    service lambda(aws:aws-lambda)[Lambda] in compute
+    service sqs(aws:amazon-simple-queue-service)[SQS] in compute
+    service s3(aws:amazon-simple-storage-service)[S3] in storage
+    service dynamo(aws:amazon-dynamodb)[DynamoDB] in storage
+
+    gateway:R --> L:lambda
+    lambda:R --> L:sqs
+    lambda:B --> T:dynamo
+    sqs:B --> T:s3
+```
+
 ## Data Flow
 
 A typical workflow run follows this sequence:

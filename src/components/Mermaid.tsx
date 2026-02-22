@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
+import awsIcons from '@/data/aws-icons.json'
 
 export function Mermaid({ code }: { code: string }) {
   const id = useId()
@@ -22,6 +23,7 @@ export function Mermaid({ code }: { code: string }) {
         fontFamily: 'inherit',
         securityLevel: 'loose',
       })
+      mermaid.registerIconPacks([{ name: 'aws', icons: awsIcons as never }])
 
       try {
         const { svg: renderedSvg } = await mermaid.render(mermaidId, code)
