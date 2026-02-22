@@ -4,6 +4,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Scroll margin for anchored headings (clears fixed header) */
+h2[id],
+h3[id] {
+  scroll-margin-top: 5rem;
+}
+
 /* rehype-pretty-code syntax highlighting */
 [data-rehype-pretty-code-figure] {
   margin: 1.5em 0;

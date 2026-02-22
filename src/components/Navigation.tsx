@@ -4,17 +4,17 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-interface NavItem {
+export interface NavItem {
   title: string
   href: string
 }
 
-interface NavGroup {
+export interface NavGroup {
   title: string
   items: NavItem[]
 }
 
-const navigation: NavGroup[] = [
+export const navigation: NavGroup[] = [
   {
     title: 'Guides',
     items: [

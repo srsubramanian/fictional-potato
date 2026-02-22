@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Logo } from './Logo'
 import { Navigation } from './Navigation'
 import { Header } from './Header'
+import { TableOfContents } from './TableOfContents'
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -44,9 +45,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Header onMenuToggle={() => setMobileNavOpen((o) => !o)} />
 
       {/* Main content */}
-      <main className="lg:ml-72 pt-14">
+      <main className="lg:ml-72 xl:mr-64 pt-14">
         <div className="px-4 py-10 sm:px-6 lg:px-8">{children}</div>
       </main>
+
+      <TableOfContents />
     </>
   )
 }
