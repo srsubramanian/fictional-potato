@@ -6,7 +6,7 @@ Workflows orchestrate multiple agents into directed acyclic graphs (DAGs). They 
 
 A workflow chains agents into a sequence of steps:
 
-```python
+```python title="workflows/content.py" {7-9}
 from agentflow import Agent, Workflow
 
 researcher = Agent("researcher", instructions="Find information on the topic.")
@@ -97,7 +97,7 @@ print(result.final_output) # Output from the last step
 
 Configure workflow-level settings in `agentflow.config.yaml`:
 
-```yaml
+```yaml title="agentflow.config.yaml"
 workflows:
   content-pipeline:
     timeout: 600          # Max execution time in seconds

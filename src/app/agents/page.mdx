@@ -31,7 +31,7 @@ assistant = Agent(
 
 Tools are Python functions decorated with `@tool` that the agent can invoke:
 
-```python
+```python title="agents/analyst.py"
 from agentflow import Agent, tool
 
 @tool
@@ -57,7 +57,7 @@ analyst = Agent(
 
 Agents can use memory to persist information across workflow runs:
 
-```python
+```python {4-8}
 from agentflow import Agent
 from agentflow.memory import RedisMemory
 
@@ -110,7 +110,7 @@ print(result.tokens)     # Token usage stats
 
 Use the generated TypeScript client to interact with agents from your React frontend:
 
-```typescript
+```typescript title="src/lib/agentflow.ts"
 import { AgentFlowClient } from '@agentflow/client'
 
 const client = new AgentFlowClient({

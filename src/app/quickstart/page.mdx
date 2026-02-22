@@ -40,7 +40,7 @@ my-project/
 
 Open `agentflow.config.yaml` and set your API key and Redis URL:
 
-```yaml
+```yaml title="agentflow.config.yaml" {5,8}
 api:
   host: 0.0.0.0
   port: 8000
@@ -56,7 +56,7 @@ queue:
 
 Create an agent in `agents/researcher.py`:
 
-```python
+```python title="agents/researcher.py" {1,3,8-12}
 from agentflow import Agent, tool
 
 @tool
@@ -76,7 +76,7 @@ researcher = Agent(
 
 Wire agents together in `workflows/pipeline.py`:
 
-```python
+```python title="workflows/pipeline.py"
 from agentflow import Workflow
 from agents.researcher import researcher
 

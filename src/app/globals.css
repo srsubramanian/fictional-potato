@@ -45,6 +45,47 @@
   color: var(--shiki-dark);
 }
 
+/* Title / filename labels */
+[data-rehype-pretty-code-title] {
+  padding: 0.5em 1.5em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+  color: #a1a1aa;
+  background-color: #1e1e2e;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-rehype-pretty-code-title] + pre {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+:where(.dark, .dark *) [data-rehype-pretty-code-title] {
+  background-color: #1e1e2e;
+  color: #a1a1aa;
+}
+
+/* Light mode title */
+:root:not(.dark) [data-rehype-pretty-code-title] {
+  background-color: #f0f0f4;
+  color: #6b7280;
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Line highlighting */
+[data-highlighted-line] {
+  background-color: rgba(99, 102, 241, 0.1);
+  border-left: 3px solid #6366f1;
+  padding-left: calc(0.25rem - 3px);
+}
+
+:where(.dark, .dark *) [data-highlighted-line] {
+  background-color: rgba(99, 102, 241, 0.15);
+  border-left-color: #818cf8;
+}
+
 /* Inline code from rehype-pretty-code */
 [data-rehype-pretty-code-figure] > code {
   display: inline;

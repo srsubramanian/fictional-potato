@@ -38,7 +38,7 @@ curl -H "Authorization: Bearer af_sk_live_abc123def456" \
 
 Or in Python:
 
-```python
+```python title="client.py"
 import httpx
 
 client = httpx.AsyncClient(
@@ -57,7 +57,7 @@ For frontend clients, use JWT tokens to authenticate users with scoped permissio
 
 Set up the JWT middleware in `agentflow.config.yaml`:
 
-```yaml
+```yaml title="agentflow.config.yaml"
 auth:
   jwt:
     issuer: https://auth.example.com
@@ -71,7 +71,7 @@ auth:
 
 The authentication middleware validates tokens and attaches user context to each request:
 
-```python
+```python title="server.py" {4-8,12}
 from agentflow.auth import JWTMiddleware, require_scope
 
 # Applied globally in the API server

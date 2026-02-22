@@ -29,7 +29,7 @@ curl -X POST http://localhost:8000/api/webhooks \
 
 Or in Python:
 
-```python
+```python title="webhooks/register.py"
 from agentflow.webhooks import WebhookManager
 
 manager = WebhookManager()
@@ -72,7 +72,7 @@ AgentFlow sends a JSON payload with event details:
 
 Every webhook request includes a signature header for verification. Always verify signatures to ensure requests are authentic.
 
-```python
+```python title="webhooks/handler.py" {6-7}
 from agentflow.webhooks import verify_signature
 
 @app.post("/hooks/agentflow")
