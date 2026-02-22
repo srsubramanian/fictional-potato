@@ -1,0 +1,38 @@
+{
+  "name": "agentflow-docs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srsubramanian/fictional-potato.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/srsubramanian/fictional-potato/issues"
+  },
+  "homepage": "https://github.com/srsubramanian/fictional-potato#readme",
+  "dependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.1.6",
+    "next": "^16.1.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.0",
+    "@types/node": "^25.3.0",
+    "@types/react": "^19.2.14",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.2.0",
+    "typescript": "^5.9.3"
+  }
+}
