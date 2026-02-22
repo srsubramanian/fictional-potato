@@ -1,0 +1,150 @@
+# Workflows
+
+Workflows orchestrate multiple agents into directed acyclic graphs (DAGs). They define execution order, dependencies, and conditional branching. This page covers the Workflow API and common patterns.
+
+## Creating a Workflow
+
+A workflow chains agents into a sequence of steps:
+
+```python
+from agentflow import Agent, Workflow
+
+researcher = Agent("researcher", instructions="Find information on the topic.")
+writer = Agent("writer", instructions="Write content based on research.")
+reviewer = Agent("reviewer", instructions="Review and improve the content.")
+
+pipeline = Workflow("content-pipeline")
+pipeline.add_step(researcher, task="Research the topic")
+pipeline.add_step(writer, task="Write a draft", depends_on=researcher)
+pipeline.add_step(reviewer, task="Review the draft", depends_on=writer)
+```
+
+## Workflow Methods
+
+| Method | Description |
+|--------|-------------|
+| `add_step(agent, task, depends_on=None)` | Add an agent step with optional dependency |
+| `add_parallel(agents, tasks)` | Add multiple agents that run concurrently |
+| `add_condition(predicate, if_true, if_false)` | Add conditional branching |
+| `run(**inputs)` | Execute the workflow with the given inputs |
+| `validate()` | Check the DAG for cycles and missing dependencies |
+| `visualize()` | Print an ASCII representation of the DAG |
+
+## Parallel Execution
+
+Run multiple agents at the same time when they don't depend on each other:
+
+```python
+pipeline = Workflow("parallel-research")
+
+# These three agents run concurrently
+pipeline.add_parallel(
+    agents=[web_searcher, db_analyst, doc_reader],
+    tasks=[
+        "Search the web for recent articles",
+        "Query the database for historical data",
+        "Read internal documentation",
+    ],
+)
+
+# This agent waits for all three to complete
+pipeline.add_step(
+    synthesizer,
+    task="Combine all findings into a report",
+    depends_on=[web_searcher, db_analyst, doc_reader],
+)
+```
+
+## Conditional Branching
+
+Route execution based on intermediate results:
+
+```python
+from agentflow import condition
+
+pipeline = Workflow("review-pipeline")
+pipeline.add_step(classifier, task="Classify the input document")
+
+pipeline.add_condition(
+    predicate=lambda result: result.output["category"] == "technical",
+    if_true=technical_reviewer,
+    if_false=general_reviewer,
+)
+
+pipeline.add_step(publisher, task="Publish the reviewed document")
+```
+
+## Running a Workflow
+
+Execute a workflow with input parameters:
+
+```python
+import asyncio
+
+result = asyncio.run(pipeline.run(
+    topic="Building AI Agents",
+    style="technical blog post",
+    max_words=2000,
+))
+
+print(result.status)       # "completed"
+print(result.steps)        # List of step results
+print(result.duration)     # Total execution time
+print(result.final_output) # Output from the last step
+```
+
+## Workflow Configuration
+
+Configure workflow-level settings in `agentflow.config.yaml`:
+
+```yaml
+workflows:
+  content-pipeline:
+    timeout: 600          # Max execution time in seconds
+    max_retries: 2        # Retry failed steps
+    retry_delay: 5        # Seconds between retries
+    on_failure: "abort"   # Or "continue" to skip failed steps
+    notifications:
+      on_complete: webhook://content-updates
+      on_failure: webhook://alerts
+```
+
+## Visualizing the DAG
+
+Inspect your workflow structure:
+
+```bash
+agentflow workflow visualize content-pipeline
+```
+
+```text
+researcher
+    ├── writer
+    │     └── reviewer
+    │           └── publisher
+    └── fact-checker
+          └── reviewer
+```
+
+## REST API
+
+Manage workflows programmatically:
+
+```bash
+# List all workflows
+curl http://localhost:8000/api/workflows
+
+# Get workflow details
+curl http://localhost:8000/api/workflows/content-pipeline
+
+# Run a workflow
+curl -X POST http://localhost:8000/api/workflows/content-pipeline/run \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "AI Agents", "style": "blog"}'
+```
+
+## Next Steps
+
+- Monitor workflow runs with the [Tasks](/tasks) API
+- Trigger workflows from external events using [Webhooks](/webhooks)
+- Secure your workflows with [Authentication](/authentication)

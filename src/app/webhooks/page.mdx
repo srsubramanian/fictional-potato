@@ -1,0 +1,156 @@
+# Webhooks
+
+Webhooks let you receive real-time notifications when events occur in AgentFlow. Register an endpoint, and AgentFlow will send HTTP POST requests with event payloads when workflows complete, tasks fail, or agents produce results.
+
+## Supported Events
+
+| Event | Description |
+|-------|-------------|
+| `workflow.completed` | A workflow run finished successfully |
+| `workflow.failed` | A workflow run failed |
+| `task.completed` | An individual task completed |
+| `task.failed` | A task failed after exhausting retries |
+| `agent.error` | An agent encountered a runtime error |
+
+## Registering a Webhook
+
+Register a webhook via the API:
+
+```bash
+curl -X POST http://localhost:8000/api/webhooks \
+  -H "Authorization: Bearer $AGENTFLOW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/hooks/agentflow",
+    "events": ["workflow.completed", "workflow.failed"],
+    "secret": "whsec_your_secret_here"
+  }'
+```
+
+Or in Python:
+
+```python
+from agentflow.webhooks import WebhookManager
+
+manager = WebhookManager()
+
+webhook = await manager.register(
+    url="https://example.com/hooks/agentflow",
+    events=["workflow.completed", "workflow.failed"],
+    secret="whsec_your_secret_here",
+)
+
+print(webhook.id)  # "whk_abc123"
+```
+
+## Payload Format
+
+AgentFlow sends a JSON payload with event details:
+
+```json
+{
+  "id": "evt_xyz789",
+  "type": "workflow.completed",
+  "timestamp": "2026-02-21T14:30:00Z",
+  "data": {
+    "workflow": "content-pipeline",
+    "run_id": "run_abc123",
+    "status": "completed",
+    "duration": 45.2,
+    "steps": [
+      {"agent": "researcher", "status": "completed"},
+      {"agent": "writer", "status": "completed"}
+    ],
+    "output": {
+      "summary": "Generated blog post about AI Agents"
+    }
+  }
+}
+```
+
+## Signature Verification
+
+Every webhook request includes a signature header for verification. Always verify signatures to ensure requests are authentic.
+
+```python
+from agentflow.webhooks import verify_signature
+
+@app.post("/hooks/agentflow")
+async def handle_webhook(request: Request):
+    payload = await request.body()
+    signature = request.headers["x-agentflow-signature"]
+    secret = "whsec_your_secret_here"
+
+    if not verify_signature(payload, signature, secret):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+
+    event = await request.json()
+    match event["type"]:
+        case "workflow.completed":
+            await handle_completion(event["data"])
+        case "workflow.failed":
+            await handle_failure(event["data"])
+
+    return {"received": True}
+```
+
+The signature is computed as an HMAC-SHA256 of the raw request body:
+
+```python
+import hmac
+import hashlib
+
+def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
+    expected = hmac.new(
+        secret.encode(),
+        payload,
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(f"sha256={expected}", signature)
+```
+
+## Managing Webhooks
+
+List, update, and delete webhooks via the REST API:
+
+```bash
+# List all webhooks
+curl http://localhost:8000/api/webhooks
+
+# Get webhook details
+curl http://localhost:8000/api/webhooks/whk_abc123
+
+# Update events
+curl -X PATCH http://localhost:8000/api/webhooks/whk_abc123 \
+  -H "Content-Type: application/json" \
+  -d '{"events": ["workflow.completed"]}'
+
+# Delete a webhook
+curl -X DELETE http://localhost:8000/api/webhooks/whk_abc123
+```
+
+## Retry Policy
+
+Failed webhook deliveries are retried with exponential backoff:
+
+- **Attempt 1** — Immediate
+- **Attempt 2** — After 10 seconds
+- **Attempt 3** — After 1 minute
+- **Attempt 4** — After 10 minutes
+- **Attempt 5** — After 1 hour
+
+A delivery is considered failed if the endpoint returns a non-2xx status code or doesn't respond within 30 seconds.
+
+## Testing Webhooks
+
+Use the CLI to send test events to your endpoint:
+
+```bash
+agentflow webhooks test whk_abc123 --event workflow.completed
+```
+
+## Next Steps
+
+- Secure your webhook endpoints with [Authentication](/authentication)
+- Monitor webhook deliveries in the [Tasks](/tasks) dashboard
+- Build [Workflows](/workflows) that trigger via webhook events

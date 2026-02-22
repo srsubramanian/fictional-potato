@@ -1,0 +1,155 @@
+# Tasks
+
+Every workflow step and standalone agent run creates a task in the queue. The Tasks API lets you submit, monitor, retry, and cancel tasks. This page covers the task lifecycle and API reference.
+
+## Task Lifecycle
+
+A task moves through these statuses:
+
+```text
+pending → running → completed
+                  → failed → retrying → running
+                  → cancelled
+```
+
+## Submitting a Task
+
+Submit a task directly to an agent (outside of a workflow):
+
+```python
+from agentflow.queue import TaskQueue
+
+queue = TaskQueue(broker="redis://localhost:6379/0")
+
+task_id = await queue.submit(
+    agent="researcher",
+    input={"topic": "Quantum Computing"},
+    priority="normal",
+    metadata={"requested_by": "user_123"},
+)
+```
+
+## Polling for Results
+
+Check task status and retrieve results:
+
+```python
+# Get current status
+status = await queue.get_status(task_id)
+print(status)  # "running"
+
+# Wait for completion (with timeout)
+result = await queue.get_result(task_id, timeout=60)
+print(result.output)
+print(result.duration)
+print(result.tokens_used)
+```
+
+## Task Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `task_id` | `str` | Unique task identifier |
+| `agent` | `str` | Agent assigned to the task |
+| `status` | `str` | Current status |
+| `input` | `dict` | Input data provided |
+| `output` | `dict \| None` | Result data (when completed) |
+| `error` | `str \| None` | Error message (when failed) |
+| `priority` | `str` | `"low"`, `"normal"`, or `"high"` |
+| `created_at` | `datetime` | When the task was created |
+| `started_at` | `datetime \| None` | When execution began |
+| `completed_at` | `datetime \| None` | When execution finished |
+| `retries` | `int` | Number of retry attempts |
+
+## Retry Configuration
+
+Configure retry behavior per task or globally:
+
+```python
+task_id = await queue.submit(
+    agent="researcher",
+    input={"topic": "AI Safety"},
+    retry_policy={
+        "max_retries": 3,
+        "backoff": "exponential",
+        "initial_delay": 2,
+        "max_delay": 30,
+    },
+)
+```
+
+## Cancelling a Task
+
+Cancel a pending or running task:
+
+```python
+await queue.cancel(task_id)
+
+# Verify cancellation
+status = await queue.get_status(task_id)
+assert status == "cancelled"
+```
+
+## Listing Tasks
+
+Query tasks with filters:
+
+```python
+# List all running tasks
+running = await queue.list_tasks(status="running")
+
+# Filter by agent
+researcher_tasks = await queue.list_tasks(agent="researcher")
+
+# Paginate results
+page = await queue.list_tasks(
+    status="completed",
+    limit=20,
+    offset=40,
+)
+```
+
+## REST API
+
+Manage tasks via HTTP endpoints:
+
+```bash
+# List tasks
+curl http://localhost:8000/api/tasks?status=running
+
+# Get task details
+curl http://localhost:8000/api/tasks/tsk_abc123
+
+# Cancel a task
+curl -X POST http://localhost:8000/api/tasks/tsk_abc123/cancel
+
+# Retry a failed task
+curl -X POST http://localhost:8000/api/tasks/tsk_abc123/retry
+```
+
+## TypeScript Client
+
+Monitor tasks from your React frontend:
+
+```typescript
+import { AgentFlowClient } from '@agentflow/client'
+
+const client = new AgentFlowClient({ baseUrl: '/api' })
+
+// Submit and poll
+const { taskId } = await client.tasks.submit({
+  agent: 'researcher',
+  input: { topic: 'AI Agents' },
+})
+
+const result = await client.tasks.waitFor(taskId, {
+  pollInterval: 1000,
+  timeout: 60000,
+})
+```
+
+## Next Steps
+
+- Set up [Webhooks](/webhooks) to receive task completion notifications
+- Build [Workflows](/workflows) that automatically manage task dependencies
+- Configure [Authentication](/authentication) to secure task endpoints

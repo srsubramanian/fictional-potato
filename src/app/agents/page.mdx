@@ -1,0 +1,129 @@
+# Agents
+
+Agents are the core building blocks of AgentFlow. Each agent has a name, a set of instructions, tools it can use, and optional memory. This page covers the Agent class API, configuration options, and usage patterns.
+
+## Creating an Agent
+
+The simplest agent needs a name and instructions:
+
+```python
+from agentflow import Agent
+
+assistant = Agent(
+    name="assistant",
+    instructions="You are a helpful assistant.",
+)
+```
+
+## Constructor Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `name` | `str` | required | Unique identifier for the agent |
+| `instructions` | `str` | required | System prompt describing the agent's behavior |
+| `tools` | `list[Tool]` | `[]` | Functions the agent can call |
+| `memory` | `MemoryStore` | `None` | Persistent memory across runs |
+| `model` | `str` | `"claude-sonnet-4-6"` | LLM model to use |
+| `max_retries` | `int` | `3` | Maximum retry attempts on failure |
+| `timeout` | `int` | `300` | Execution timeout in seconds |
+
+## Adding Tools
+
+Tools are Python functions decorated with `@tool` that the agent can invoke:
+
+```python
+from agentflow import Agent, tool
+
+@tool
+def calculate(expression: str) -> float:
+    """Evaluate a mathematical expression."""
+    return eval(expression)  # Use a safe evaluator in production
+
+@tool
+def fetch_data(url: str) -> dict:
+    """Fetch JSON data from a URL."""
+    import httpx
+    response = httpx.get(url)
+    return response.json()
+
+analyst = Agent(
+    name="analyst",
+    instructions="You analyze data and perform calculations.",
+    tools=[calculate, fetch_data],
+)
+```
+
+## Agent Memory
+
+Agents can use memory to persist information across workflow runs:
+
+```python
+from agentflow import Agent
+from agentflow.memory import RedisMemory
+
+agent = Agent(
+    name="researcher",
+    instructions="Research topics and remember what you've found.",
+    memory=RedisMemory(
+        namespace="researcher",
+        ttl=3600,  # Expire after 1 hour
+    ),
+)
+```
+
+Memory supports these operations:
+
+```python
+# Inside a tool or agent runtime
+await memory.set("key", {"data": "value"})
+result = await memory.get("key")
+await memory.delete("key")
+keys = await memory.list("prefix:*")
+```
+
+## Running an Agent Directly
+
+You can run an agent outside of a workflow for testing or standalone use:
+
+```python
+import asyncio
+
+result = asyncio.run(assistant.run(
+    input="Summarize the key points of quantum computing.",
+))
+
+print(result.output)     # The agent's response text
+print(result.tool_calls) # List of tools invoked
+print(result.tokens)     # Token usage stats
+```
+
+## Agent Lifecycle
+
+1. **Initialize** — Agent loads its instructions, tools, and memory
+2. **Receive Input** — The workflow engine or direct call provides input
+3. **Plan** — The agent determines which tools to use
+4. **Execute** — Tools are called, results are collected
+5. **Respond** — The agent generates its final output
+6. **Persist** — Memory is updated if configured
+
+## TypeScript Client
+
+Use the generated TypeScript client to interact with agents from your React frontend:
+
+```typescript
+import { AgentFlowClient } from '@agentflow/client'
+
+const client = new AgentFlowClient({
+  baseUrl: 'http://localhost:8000/api',
+  apiKey: process.env.AGENTFLOW_API_KEY,
+})
+
+const agents = await client.agents.list()
+const agent = await client.agents.get('researcher')
+```
+
+## Next Steps
+
+- Compose agents into [Workflows](/workflows) for multi-step processing
+- Monitor agent execution via the [Tasks](/tasks) API
+- Trigger agents from external events with [Webhooks](/webhooks)

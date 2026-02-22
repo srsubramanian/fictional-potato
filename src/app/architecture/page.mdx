@@ -1,0 +1,114 @@
+# Architecture
+
+AgentFlow is composed of four core subsystems that work together to execute agentic workflows. This page explains how the pieces fit together and the lifecycle of a workflow run.
+
+## System Overview
+
+The architecture follows a layered design:
+
+1. **API Layer** — FastAPI server exposing REST endpoints for workflow management
+2. **Workflow Engine** — Orchestrates agent execution order based on a directed acyclic graph (DAG)
+3. **Agent Runtime** — Executes individual agents with their tools, memory, and instructions
+4. **Task Queue** — Distributes work across workers using Redis-backed async queues
+
+## Request Lifecycle
+
+When a client submits a workflow run, the system processes it through these stages:
+
+```text
+Client → API Server → Workflow Engine → Task Queue → Agent Runtime → Response
+```
+
+Each stage is decoupled, allowing horizontal scaling of workers independently from the API server.
+
+## Core Components
+
+### API Server
+
+The FastAPI server handles authentication, request validation, and routing. It exposes endpoints for managing agents, workflows, tasks, and webhooks.
+
+```python
+from fastapi import FastAPI
+from agentflow.api import router
+
+app = FastAPI(title="AgentFlow API")
+app.include_router(router, prefix="/api")
+```
+
+### Workflow Engine
+
+The workflow engine resolves the DAG, determines execution order, and manages step transitions. It supports sequential, parallel, and conditional execution.
+
+```python
+from agentflow.engine import WorkflowEngine
+
+engine = WorkflowEngine()
+execution_plan = engine.resolve(workflow)
+
+# execution_plan contains ordered steps:
+# [
+#   Step(agent=researcher, parallel_group=0),
+#   Step(agent=writer, parallel_group=1),
+#   Step(agent=reviewer, parallel_group=1),
+#   Step(agent=publisher, parallel_group=2),
+# ]
+```
+
+### Agent Runtime
+
+Each agent runs in its own runtime context with isolated memory, tool access, and configurable retry behavior.
+
+```typescript
+interface AgentRuntime {
+  agent: Agent
+  memory: MemoryStore
+  tools: Tool[]
+  maxRetries: number
+  timeout: number
+}
+```
+
+### Task Queue
+
+The task queue uses Redis streams for reliable message delivery. Tasks are submitted by the workflow engine and consumed by worker processes.
+
+```python
+from agentflow.queue import TaskQueue
+
+queue = TaskQueue(broker="redis://localhost:6379/0")
+
+# Submit a task
+task_id = await queue.submit(
+    agent="researcher",
+    input={"topic": "AI Agents"},
+    priority="high",
+)
+
+# Poll for result
+result = await queue.get_result(task_id)
+```
+
+## Data Flow
+
+A typical workflow run follows this sequence:
+
+1. Client sends a POST request to `/api/workflows/{name}/run`
+2. API server validates the request and creates a workflow run record
+3. Workflow engine resolves the DAG and enqueues the first step(s)
+4. Workers pick up tasks, execute agents, and store results
+5. Engine checks dependencies and enqueues subsequent steps
+6. When all steps complete, the run status transitions to `completed`
+7. Client polls or receives a webhook notification with the final result
+
+## Scaling
+
+- **API Server** — Horizontally scalable behind a load balancer
+- **Workers** — Add worker processes to increase throughput
+- **Redis** — Use Redis Cluster for high availability
+- **State** — Workflow state is persisted in PostgreSQL for durability
+
+## Next Steps
+
+- Set up [Authentication](/authentication) for your API server
+- Learn about [Agents](/agents) and their configuration options
+- Explore [Workflows](/workflows) to build complex execution graphs

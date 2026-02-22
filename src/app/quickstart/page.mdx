@@ -1,0 +1,127 @@
+# Quickstart
+
+Get up and running with AgentFlow in under five minutes. This guide walks you through installation, configuration, and running your first agentic workflow.
+
+## Prerequisites
+
+- Python 3.11 or later
+- Node.js 20 or later (for the React frontend)
+- A running Redis instance (for the task queue)
+
+## Installation
+
+Install the AgentFlow Python package and CLI:
+
+```bash
+pip install agentflow
+```
+
+Scaffold a new project:
+
+```bash
+agentflow init my-project
+cd my-project
+```
+
+This creates the following structure:
+
+```text
+my-project/
+  agents/
+    __init__.py
+    researcher.py
+  workflows/
+    pipeline.py
+  agentflow.config.yaml
+  requirements.txt
+```
+
+## Configuration
+
+Open `agentflow.config.yaml` and set your API key and Redis URL:
+
+```yaml
+api:
+  host: 0.0.0.0
+  port: 8000
+
+auth:
+  api_key: ${AGENTFLOW_API_KEY}
+
+queue:
+  broker: redis://localhost:6379/0
+```
+
+## Define Your First Agent
+
+Create an agent in `agents/researcher.py`:
+
+```python
+from agentflow import Agent, tool
+
+@tool
+def search(query: str) -> list[str]:
+    """Search the web for information."""
+    # Your search implementation here
+    return [f"Result for: {query}"]
+
+researcher = Agent(
+    name="researcher",
+    instructions="You are a research assistant. Find relevant information.",
+    tools=[search],
+)
+```
+
+## Build a Workflow
+
+Wire agents together in `workflows/pipeline.py`:
+
+```python
+from agentflow import Workflow
+from agents.researcher import researcher
+
+pipeline = Workflow("research-pipeline")
+pipeline.add_step(researcher, task="Research the given topic")
+
+if __name__ == "__main__":
+    import asyncio
+    result = asyncio.run(pipeline.run(topic="AI Agents"))
+    print(result)
+```
+
+## Run the Server
+
+Start the AgentFlow API server:
+
+```bash
+agentflow serve
+```
+
+The API is now available at `http://localhost:8000`. Visit `/docs` for the interactive Swagger UI.
+
+## Run a Workflow via the API
+
+Submit a workflow run using `curl`:
+
+```bash
+curl -X POST http://localhost:8000/api/workflows/research-pipeline/run \
+  -H "Authorization: Bearer $AGENTFLOW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "AI Agents"}'
+```
+
+You'll receive a task ID you can use to poll for results:
+
+```json
+{
+  "task_id": "tsk_abc123",
+  "status": "pending",
+  "workflow": "research-pipeline"
+}
+```
+
+## Next Steps
+
+- Learn about the [Architecture](/architecture) to understand how components interact
+- Explore the [Agents](/agents) API reference for advanced agent configuration
+- Set up [Authentication](/authentication) for production deployments

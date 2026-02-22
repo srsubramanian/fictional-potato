@@ -16,7 +16,6 @@ export function Prose({
         'dark:prose-a:text-emerald-400 dark:hover:prose-a:text-emerald-300',
         'prose-code:rounded prose-code:bg-zinc-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:font-medium',
         'dark:prose-code:bg-zinc-800',
-        'prose-pre:rounded-lg prose-pre:bg-zinc-900 dark:prose-pre:bg-zinc-800/50 dark:prose-pre:ring-1 dark:prose-pre:ring-zinc-700',
         className,
       )}
     >
