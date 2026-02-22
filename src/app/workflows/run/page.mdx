@@ -1,0 +1,76 @@
+# Run a workflow {{ tag: 'POST', label: '/v1/workflows/:id/run' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to execute a workflow with the given input parameters. It creates a workflow run and returns immediately with the run details. Use the [Tasks](/tasks) API to monitor individual step execution.
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="inputs" type="object">
+        Key-value pairs passed as input to the first step.
+      </Property>
+      <Property name="priority" type="string">
+        Run priority: `"low"`, `"normal"`, or `"high"`. Defaults to `"normal"`.
+      </Property>
+      <Property name="webhook_url" type="string">
+        URL to receive a notification when the run completes.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/workflows/:id/run">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X POST http://localhost:8000/v1/workflows/wfl_abc123/run \
+      -H "Authorization: Bearer {token}" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "inputs": {
+          "topic": "Building AI Agents",
+          "style": "technical blog post",
+          "max_words": 2000
+        }
+      }'
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    run = client.workflows.run("wfl_abc123",
+        inputs={
+            "topic": "Building AI Agents",
+            "style": "technical blog post",
+            "max_words": 2000,
+        },
+    )
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "run_id": "run_xyz789",
+      "workflow_id": "wfl_abc123",
+      "status": "running",
+      "inputs": {
+        "topic": "Building AI Agents",
+        "style": "technical blog post",
+        "max_words": 2000
+      },
+      "steps": [
+        {"agent": "researcher", "status": "running"},
+        {"agent": "writer", "status": "pending"},
+        {"agent": "reviewer", "status": "pending"}
+      ],
+      "created_at": "2026-02-22T15:00:00Z"
+    }
+    ```
+
+  </Col>
+</Row>

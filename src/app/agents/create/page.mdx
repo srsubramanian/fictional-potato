@@ -1,0 +1,86 @@
+# Create an agent {{ tag: 'POST', label: '/v1/agents' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to create a new agent. A name and instructions are required to create an agent.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="name" type="string">
+        Human-readable name for the agent.
+      </Property>
+      <Property name="instructions" type="string">
+        System prompt describing the agent behavior.
+      </Property>
+    </Properties>
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="model" type="string">
+        LLM model to use. Defaults to `"claude-sonnet-4-6"`.
+      </Property>
+      <Property name="tools" type="array">
+        List of tool definitions the agent can invoke.
+      </Property>
+      <Property name="memory" type="object">
+        Memory store configuration.
+      </Property>
+      <Property name="max_retries" type="integer">
+        Maximum retry attempts. Defaults to `3`.
+      </Property>
+      <Property name="timeout" type="integer">
+        Execution timeout in seconds. Defaults to `300`.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/agents">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X POST http://localhost:8000/v1/agents \
+      -H "Authorization: Bearer {token}" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "name": "researcher",
+        "instructions": "Research topics and summarize findings.",
+        "tools": ["web_search", "fetch_data"]
+      }'
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    agent = client.agents.create(
+        name="researcher",
+        instructions="Research topics and summarize findings.",
+        tools=["web_search", "fetch_data"],
+    )
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "agt_abc123",
+      "name": "researcher",
+      "instructions": "Research topics and summarize findings.",
+      "model": "claude-sonnet-4-6",
+      "tools": ["web_search", "fetch_data"],
+      "memory": null,
+      "max_retries": 3,
+      "timeout": 300,
+      "status": "active",
+      "created_at": "2026-02-21T10:00:00Z",
+      "updated_at": "2026-02-21T10:00:00Z"
+    }
+    ```
+
+  </Col>
+</Row>

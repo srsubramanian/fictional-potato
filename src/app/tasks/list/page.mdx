@@ -1,0 +1,79 @@
+# List all tasks {{ tag: 'GET', label: '/v1/tasks' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retrieve a paginated list of all your tasks. By default, a maximum of twenty tasks are shown per page.
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="limit" type="integer">
+        Limit the number of tasks returned. Defaults to `20`.
+      </Property>
+      <Property name="offset" type="integer">
+        Number of tasks to skip for pagination.
+      </Property>
+      <Property name="status" type="string">
+        Filter by status: `"pending"`, `"running"`, `"completed"`, `"failed"`, or `"cancelled"`.
+      </Property>
+      <Property name="agent" type="string">
+        Filter by agent name.
+      </Property>
+      <Property name="workflow_id" type="string">
+        Filter by workflow ID.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/v1/tasks">
+
+    ```bash {{ title: 'cURL' }}
+    curl -G http://localhost:8000/v1/tasks \
+      -H "Authorization: Bearer {token}" \
+      -d status=running \
+      -d limit=10
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    tasks = client.tasks.list(status="running", limit=10)
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "has_more": true,
+      "data": [
+        {
+          "id": "tsk_abc123",
+          "agent": "researcher",
+          "status": "running",
+          "input": {"topic": "Quantum Computing"},
+          "output": null,
+          "error": null,
+          "priority": "normal",
+          "workflow_id": "wfl_abc123",
+          "run_id": "run_xyz789",
+          "retries": 0,
+          "duration": null,
+          "tokens_used": null,
+          "created_at": "2026-02-22T15:00:00Z",
+          "started_at": "2026-02-22T15:00:01Z",
+          "completed_at": null
+        },
+        {
+          "id": "tsk_def456"
+        }
+      ]
+    }
+    ```
+
+  </Col>
+</Row>

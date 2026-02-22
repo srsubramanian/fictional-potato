@@ -1,0 +1,38 @@
+# The workflow model
+
+The workflow model contains all the information about a workflow, including its steps, dependencies, configuration, and execution history.
+
+### Properties
+
+<Properties>
+  <Property name="id" type="string">
+    Unique identifier for the workflow.
+  </Property>
+  <Property name="name" type="string">
+    Human-readable name for the workflow.
+  </Property>
+  <Property name="description" type="string">
+    Description of what the workflow does.
+  </Property>
+  <Property name="steps" type="array">
+    Ordered list of step definitions, each referencing an agent and task.
+  </Property>
+  <Property name="timeout" type="integer">
+    Maximum execution time in seconds. Defaults to `600`.
+  </Property>
+  <Property name="max_retries" type="integer">
+    Number of times to retry failed steps. Defaults to `2`.
+  </Property>
+  <Property name="on_failure" type="string">
+    Failure strategy: `"abort"` or `"continue"`. Defaults to `"abort"`.
+  </Property>
+  <Property name="status" type="string">
+    Current workflow status: `"active"`, `"inactive"`, or `"error"`.
+  </Property>
+  <Property name="created_at" type="timestamp">
+    Timestamp of when the workflow was created.
+  </Property>
+  <Property name="updated_at" type="timestamp">
+    Timestamp of when the workflow was last updated.
+  </Property>
+</Properties>

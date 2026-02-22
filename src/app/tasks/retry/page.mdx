@@ -1,0 +1,49 @@
+# Retry a task {{ tag: 'POST', label: '/v1/tasks/:id/retry' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retry a failed task. A new task is created with the same input and agent, and the retry counter is incremented.
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/tasks/:id/retry">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X POST http://localhost:8000/v1/tasks/tsk_abc123/retry \
+      -H "Authorization: Bearer {token}"
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    retried = client.tasks.retry("tsk_abc123")
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "tsk_ghi789",
+      "agent": "researcher",
+      "status": "pending",
+      "input": {"topic": "Quantum Computing"},
+      "output": null,
+      "error": null,
+      "priority": "normal",
+      "workflow_id": null,
+      "run_id": null,
+      "retries": 1,
+      "duration": null,
+      "tokens_used": null,
+      "created_at": "2026-02-22T16:00:00Z",
+      "started_at": null,
+      "completed_at": null
+    }
+    ```
+
+  </Col>
+</Row>

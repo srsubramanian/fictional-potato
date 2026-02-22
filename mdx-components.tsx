@@ -1,21 +1,10 @@
-import type { MDXComponents } from 'mdx/types'
-import { Prose } from '@/components/Prose'
-import { CodeBlock } from '@/components/CodeBlock'
-import { PrevNextLinks } from '@/components/PrevNextLinks'
+import { type MDXComponents } from 'mdx/types'
 
-export function useMDXComponents(components: MDXComponents): MDXComponents {
+import * as mdxComponents from '@/components/mdx'
+
+export function useMDXComponents(components: MDXComponents) {
   return {
     ...components,
-    pre: (props) => <CodeBlock {...props} />,
-    wrapper({ children }) {
-      return (
-        <article>
-          <Prose>{children}</Prose>
-          <div className="mx-auto max-w-3xl">
-            <PrevNextLinks />
-          </div>
-        </article>
-      )
-    },
+    ...mdxComponents,
   }
 }

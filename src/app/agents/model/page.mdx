@@ -1,0 +1,41 @@
+# The agent model
+
+The agent model contains all the information about an agent, including its configuration, tools, memory settings, and runtime parameters.
+
+### Properties
+
+<Properties>
+  <Property name="id" type="string">
+    Unique identifier for the agent.
+  </Property>
+  <Property name="name" type="string">
+    Human-readable name for the agent.
+  </Property>
+  <Property name="instructions" type="string">
+    System prompt describing the agent behavior.
+  </Property>
+  <Property name="model" type="string">
+    LLM model the agent uses. Defaults to `"claude-sonnet-4-6"`.
+  </Property>
+  <Property name="tools" type="array">
+    List of tool definitions the agent can invoke.
+  </Property>
+  <Property name="memory" type="object | null">
+    Memory store configuration for persisting data across runs.
+  </Property>
+  <Property name="max_retries" type="integer">
+    Maximum retry attempts on failure. Defaults to `3`.
+  </Property>
+  <Property name="timeout" type="integer">
+    Execution timeout in seconds. Defaults to `300`.
+  </Property>
+  <Property name="status" type="string">
+    Current agent status: `"active"`, `"inactive"`, or `"error"`.
+  </Property>
+  <Property name="created_at" type="timestamp">
+    Timestamp of when the agent was created.
+  </Property>
+  <Property name="updated_at" type="timestamp">
+    Timestamp of when the agent was last updated.
+  </Property>
+</Properties>

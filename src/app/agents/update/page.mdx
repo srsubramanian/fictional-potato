@@ -1,0 +1,79 @@
+# Update an agent {{ tag: 'PUT', label: '/v1/agents/:id' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to perform an update on an agent. You can update the instructions, tools, memory configuration, and runtime parameters.
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="name" type="string">
+        Updated name for the agent.
+      </Property>
+      <Property name="instructions" type="string">
+        Updated system prompt.
+      </Property>
+      <Property name="model" type="string">
+        Updated LLM model to use.
+      </Property>
+      <Property name="tools" type="array">
+        Updated list of tool definitions.
+      </Property>
+      <Property name="memory" type="object">
+        Updated memory store configuration.
+      </Property>
+      <Property name="max_retries" type="integer">
+        Updated maximum retry attempts.
+      </Property>
+      <Property name="timeout" type="integer">
+        Updated execution timeout in seconds.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="PUT" label="/v1/agents/:id">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X PUT http://localhost:8000/v1/agents/agt_abc123 \
+      -H "Authorization: Bearer {token}" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "instructions": "Research AI topics and provide detailed analysis.",
+        "max_retries": 5
+      }'
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    agent = client.agents.update("agt_abc123",
+        instructions="Research AI topics and provide detailed analysis.",
+        max_retries=5,
+    )
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "agt_abc123",
+      "name": "researcher",
+      "instructions": "Research AI topics and provide detailed analysis.",
+      "model": "claude-sonnet-4-6",
+      "tools": ["web_search", "fetch_data"],
+      "memory": null,
+      "max_retries": 5,
+      "timeout": 300,
+      "status": "active",
+      "created_at": "2026-02-21T10:00:00Z",
+      "updated_at": "2026-02-22T14:30:00Z"
+    }
+    ```
+
+  </Col>
+</Row>

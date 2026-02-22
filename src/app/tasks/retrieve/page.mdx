@@ -1,0 +1,52 @@
+# Retrieve a task {{ tag: 'GET', label: '/v1/tasks/:id' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retrieve a task by providing the task id. Refer to [the task model](/tasks/model) to see which properties are included with task objects.
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/v1/tasks/:id">
+
+    ```bash {{ title: 'cURL' }}
+    curl http://localhost:8000/v1/tasks/tsk_abc123 \
+      -H "Authorization: Bearer {token}"
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    task = client.tasks.get("tsk_abc123")
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "tsk_abc123",
+      "agent": "researcher",
+      "status": "completed",
+      "input": {"topic": "Quantum Computing"},
+      "output": {
+        "summary": "Quantum computing uses qubits...",
+        "sources": ["arxiv.org/abs/2301.001", "nature.com/articles/s41586"]
+      },
+      "error": null,
+      "priority": "normal",
+      "workflow_id": null,
+      "run_id": null,
+      "retries": 0,
+      "duration": 12.4,
+      "tokens_used": 3420,
+      "created_at": "2026-02-22T15:00:00Z",
+      "started_at": "2026-02-22T15:00:01Z",
+      "completed_at": "2026-02-22T15:00:13Z"
+    }
+    ```
+
+  </Col>
+</Row>

@@ -1,0 +1,48 @@
+# Retrieve a workflow {{ tag: 'GET', label: '/v1/workflows/:id' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retrieve a workflow by providing the workflow id. Refer to [the workflow model](/workflows/model) to see which properties are included with workflow objects.
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/v1/workflows/:id">
+
+    ```bash {{ title: 'cURL' }}
+    curl http://localhost:8000/v1/workflows/wfl_abc123 \
+      -H "Authorization: Bearer {token}"
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    workflow = client.workflows.get("wfl_abc123")
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "wfl_abc123",
+      "name": "content-pipeline",
+      "description": "Research, write, and review content.",
+      "steps": [
+        {"agent": "researcher", "task": "Research the topic"},
+        {"agent": "writer", "task": "Write a draft", "depends_on": "researcher"},
+        {"agent": "reviewer", "task": "Review the draft", "depends_on": "writer"}
+      ],
+      "timeout": 600,
+      "max_retries": 2,
+      "on_failure": "abort",
+      "status": "active",
+      "created_at": "2026-02-21T10:00:00Z",
+      "updated_at": "2026-02-21T10:00:00Z"
+    }
+    ```
+
+  </Col>
+</Row>

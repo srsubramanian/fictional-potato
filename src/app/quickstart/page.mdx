@@ -1,127 +1,98 @@
+export const metadata = {
+  title: 'Quickstart',
+  description:
+    'This guide will get you all set up and ready to use the Protocol API. We\'ll cover how to get started an API client and how to make your first API request.',
+}
+
 # Quickstart
 
-Get up and running with AgentFlow in under five minutes. This guide walks you through installation, configuration, and running your first agentic workflow.
+This guide will get you all set up and ready to use the Protocol API. We'll cover how to get started using one of our API clients and how to make your first API request. We'll also look at where to go next to find all the information you need to take full advantage of our powerful REST API. {{ className: 'lead' }}
 
-## Prerequisites
+<Note>
+  Before you can make requests to the Protocol API, you will need to grab your
+  API key from your dashboard. You find it under [Settings &raquo; API](#).
+</Note>
 
-- Python 3.11 or later
-- Node.js 20 or later (for the React frontend)
-- A running Redis instance (for the task queue)
+## Choose your client
 
-## Installation
+Before making your first API request, you need to pick which API client you will use. In addition to good ol' cURL HTTP requests, Protocol offers clients for JavaScript, Python, and PHP. In the following example, you can see how to install each client.
 
-Install the AgentFlow Python package and CLI:
+<CodeGroup>
 
-```bash
-pip install agentflow
+```bash {{ title: 'cURL' }}
+# cURL is most likely already installed on your machine
+curl --version
 ```
 
-Scaffold a new project:
-
-```bash
-agentflow init my-project
-cd my-project
+```bash {{ language: 'js' }}
+# Install the Protocol JavaScript SDK
+npm install @example/protocol-api --save
 ```
 
-This creates the following structure:
-
-```text
-my-project/
-  agents/
-    __init__.py
-    researcher.py
-  workflows/
-    pipeline.py
-  agentflow.config.yaml
-  requirements.txt
+```bash {{ language: 'python' }}
+# Install the Protocol Python SDK
+pip install protocol_api
 ```
 
-## Configuration
-
-Open `agentflow.config.yaml` and set your API key and Redis URL:
-
-```yaml title="agentflow.config.yaml" {5,8}
-api:
-  host: 0.0.0.0
-  port: 8000
-
-auth:
-  api_key: ${AGENTFLOW_API_KEY}
-
-queue:
-  broker: redis://localhost:6379/0
+```bash {{ language: 'php' }}
+# Install the Protocol PHP SDK
+composer require protocol/sdk
 ```
 
-## Define Your First Agent
+</CodeGroup>
 
-Create an agent in `agents/researcher.py`:
+<div className="not-prose">
+  <Button href="/sdks" variant="text" arrow="right">
+    <>Check out our list of first-party SDKs</>
+  </Button>
+</div>
 
-```python title="agents/researcher.py" {1,3,8-12}
-from agentflow import Agent, tool
+## Making your first API request
 
-@tool
-def search(query: str) -> list[str]:
-    """Search the web for information."""
-    # Your search implementation here
-    return [f"Result for: {query}"]
+After picking your preferred client, you are ready to make your first call to the Protocol API. Below, you can see how to send a GET request to the Conversations endpoint to get a list of all your conversations. In the cURL example, results are limited to ten conversations, the default page length for each client.
 
-researcher = Agent(
-    name="researcher",
-    instructions="You are a research assistant. Find relevant information.",
-    tools=[search],
-)
+<CodeGroup tag="GET" label="/v1/conversations">
+
+```bash {{ title: 'cURL' }}
+curl -G https://api.protocol.chat/v1/conversations \
+  -H "Authorization: Bearer {token}" \
+  -d limit=10
 ```
 
-## Build a Workflow
+```js
+import ApiClient from '@example/protocol-api'
 
-Wire agents together in `workflows/pipeline.py`:
+const client = new ApiClient(token)
 
-```python title="workflows/pipeline.py"
-from agentflow import Workflow
-from agents.researcher import researcher
-
-pipeline = Workflow("research-pipeline")
-pipeline.add_step(researcher, task="Research the given topic")
-
-if __name__ == "__main__":
-    import asyncio
-    result = asyncio.run(pipeline.run(topic="AI Agents"))
-    print(result)
+await client.conversations.list()
 ```
 
-## Run the Server
+```python
+from protocol_api import ApiClient
 
-Start the AgentFlow API server:
+client = ApiClient(token)
 
-```bash
-agentflow serve
+client.conversations.list()
 ```
 
-The API is now available at `http://localhost:8000`. Visit `/docs` for the interactive Swagger UI.
+```php
+$client = new \Protocol\ApiClient($token);
 
-## Run a Workflow via the API
-
-Submit a workflow run using `curl`:
-
-```bash
-curl -X POST http://localhost:8000/api/workflows/research-pipeline/run \
-  -H "Authorization: Bearer $AGENTFLOW_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"topic": "AI Agents"}'
+$client->conversations->list();
 ```
 
-You'll receive a task ID you can use to poll for results:
+</CodeGroup>
 
-```json
-{
-  "task_id": "tsk_abc123",
-  "status": "pending",
-  "workflow": "research-pipeline"
-}
-```
+<div className="not-prose">
+  <Button href="/conversations" variant="text" arrow="right">
+    <>Read the docs for the Conversations endpoint</>
+  </Button>
+</div>
 
-## Next Steps
+## What's next?
 
-- Learn about the [Architecture](/architecture) to understand how components interact
-- Explore the [Agents](/agents) API reference for advanced agent configuration
-- Set up [Authentication](/authentication) for production deployments
+Great, you're now set up with an API client and have made your first request to the API. Here are a few links that might be handy as you venture further into the Protocol API:
+
+- [Grab your API key from the Protocol dashboard](#)
+- [Check out the Conversations endpoint](/conversations)
+- [Learn about the different error messages in Protocol](/errors)

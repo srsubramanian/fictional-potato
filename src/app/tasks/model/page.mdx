@@ -1,0 +1,53 @@
+# The task model
+
+The task model contains all the information about a task, including its input, output, status, and execution metadata.
+
+### Properties
+
+<Properties>
+  <Property name="id" type="string">
+    Unique identifier for the task.
+  </Property>
+  <Property name="agent" type="string">
+    Name of the agent assigned to the task.
+  </Property>
+  <Property name="status" type="string">
+    Current status: `"pending"`, `"running"`, `"completed"`, `"failed"`, or `"cancelled"`.
+  </Property>
+  <Property name="input" type="object">
+    Input data provided to the agent.
+  </Property>
+  <Property name="output" type="object | null">
+    Result data when the task is completed.
+  </Property>
+  <Property name="error" type="string | null">
+    Error message when the task has failed.
+  </Property>
+  <Property name="priority" type="string">
+    Priority level: `"low"`, `"normal"`, or `"high"`.
+  </Property>
+  <Property name="workflow_id" type="string | null">
+    Workflow that created this task, if any.
+  </Property>
+  <Property name="run_id" type="string | null">
+    Workflow run that created this task, if any.
+  </Property>
+  <Property name="retries" type="integer">
+    Number of retry attempts so far.
+  </Property>
+  <Property name="duration" type="number | null">
+    Execution duration in seconds when completed.
+  </Property>
+  <Property name="tokens_used" type="integer | null">
+    Total tokens consumed during execution.
+  </Property>
+  <Property name="created_at" type="timestamp">
+    Timestamp of when the task was created.
+  </Property>
+  <Property name="started_at" type="timestamp | null">
+    Timestamp of when execution began.
+  </Property>
+  <Property name="completed_at" type="timestamp | null">
+    Timestamp of when execution finished.
+  </Property>
+</Properties>

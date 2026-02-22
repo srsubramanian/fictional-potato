@@ -1,55 +1,46 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { Logo } from './Logo'
-import { Navigation } from './Navigation'
-import { Header } from './Header'
-import { TableOfContents } from './TableOfContents'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-export function Layout({ children }: { children: React.ReactNode }) {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+import { Footer } from '@/components/Footer'
+import { Header } from '@/components/Header'
+import { Logo } from '@/components/Logo'
+import { Navigation } from '@/components/Navigation'
+import { SectionProvider, type Section } from '@/components/SectionProvider'
 
-  const closeMobileNav = useCallback(() => setMobileNavOpen(false), [])
-
-  useEffect(() => {
-    if (!mobileNavOpen) return
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setMobileNavOpen(false)
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [mobileNavOpen])
+export function Layout({
+  children,
+  allSections,
+}: {
+  children: React.ReactNode
+  allSections: Record<string, Array<Section>>
+}) {
+  let pathname = usePathname()
 
   return (
-    <>
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 overflow-y-auto border-r border-zinc-200 bg-white px-6 py-6 dark:border-zinc-700 dark:bg-zinc-900 lg:block">
-        <Logo />
-        <Navigation className="mt-8" />
-      </aside>
-
-      {/* Mobile sidebar overlay */}
-      {mobileNavOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/30 lg:hidden"
-            onClick={closeMobileNav}
-          />
-          <aside className="fixed inset-y-0 left-0 z-50 w-72 overflow-y-auto bg-white px-6 py-6 dark:bg-zinc-900 lg:hidden">
-            <Logo />
-            <Navigation className="mt-8" onLinkClick={closeMobileNav} />
-          </aside>
-        </>
-      )}
-
-      <Header onMenuToggle={() => setMobileNavOpen((o) => !o)} />
-
-      {/* Main content */}
-      <main className="lg:ml-72 xl:mr-64 pt-14">
-        <div className="px-4 py-10 sm:px-6 lg:px-8">{children}</div>
-      </main>
-
-      <TableOfContents />
-    </>
+    <SectionProvider sections={allSections[pathname] ?? []}>
+      <div className="h-full lg:ml-72 xl:ml-80">
+        <motion.header
+          layoutScroll
+          className="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex"
+        >
+          <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:px-6 lg:pt-4 lg:pb-8 xl:w-80 lg:dark:border-white/10">
+            <div className="hidden lg:flex">
+              <Link href="/" aria-label="Home">
+                <Logo className="h-6" />
+              </Link>
+            </div>
+            <Header />
+            <Navigation className="hidden lg:mt-10 lg:block" />
+          </div>
+        </motion.header>
+        <div className="relative flex h-full flex-col px-4 pt-14 sm:px-6 lg:px-8">
+          <main className="flex-auto">{children}</main>
+          <Footer />
+        </div>
+      </div>
+    </SectionProvider>
   )
 }

@@ -1,0 +1,86 @@
+# Submit a task {{ tag: 'POST', label: '/v1/tasks' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to submit a new task directly to an agent, outside of a workflow. This is useful for one-off agent runs or testing.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="agent" type="string">
+        Name of the agent to assign the task to.
+      </Property>
+      <Property name="input" type="object">
+        Input data to pass to the agent.
+      </Property>
+    </Properties>
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="priority" type="string">
+        Task priority: `"low"`, `"normal"`, or `"high"`. Defaults to `"normal"`.
+      </Property>
+      <Property name="metadata" type="object">
+        Arbitrary metadata to attach to the task.
+      </Property>
+      <Property name="retry_policy" type="object">
+        Custom retry configuration with `max_retries`, `backoff`, `initial_delay`, and `max_delay`.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/tasks">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X POST http://localhost:8000/v1/tasks \
+      -H "Authorization: Bearer {token}" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "agent": "researcher",
+        "input": {"topic": "Quantum Computing"},
+        "priority": "normal",
+        "metadata": {"requested_by": "user_123"}
+      }'
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    task = client.tasks.submit(
+        agent="researcher",
+        input={"topic": "Quantum Computing"},
+        priority="normal",
+        metadata={"requested_by": "user_123"},
+    )
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "tsk_abc123",
+      "agent": "researcher",
+      "status": "pending",
+      "input": {"topic": "Quantum Computing"},
+      "output": null,
+      "error": null,
+      "priority": "normal",
+      "workflow_id": null,
+      "run_id": null,
+      "retries": 0,
+      "duration": null,
+      "tokens_used": null,
+      "created_at": "2026-02-22T15:00:00Z",
+      "started_at": null,
+      "completed_at": null
+    }
+    ```
+
+  </Col>
+</Row>

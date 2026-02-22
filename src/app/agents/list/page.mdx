@@ -1,0 +1,68 @@
+# List all agents {{ tag: 'GET', label: '/v1/agents' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retrieve a paginated list of all your agents. By default, a maximum of twenty agents are shown per page.
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="limit" type="integer">
+        Limit the number of agents returned. Defaults to `20`.
+      </Property>
+      <Property name="offset" type="integer">
+        Number of agents to skip for pagination.
+      </Property>
+      <Property name="status" type="string">
+        Filter agents by status: `"active"`, `"inactive"`, or `"error"`.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/v1/agents">
+
+    ```bash {{ title: 'cURL' }}
+    curl -G http://localhost:8000/v1/agents \
+      -H "Authorization: Bearer {token}" \
+      -d limit=10
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    agents = client.agents.list(limit=10)
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "has_more": false,
+      "data": [
+        {
+          "id": "agt_abc123",
+          "name": "researcher",
+          "instructions": "Research topics and summarize findings.",
+          "model": "claude-sonnet-4-6",
+          "tools": ["web_search", "fetch_data"],
+          "memory": null,
+          "max_retries": 3,
+          "timeout": 300,
+          "status": "active",
+          "created_at": "2026-02-21T10:00:00Z",
+          "updated_at": "2026-02-21T10:00:00Z"
+        },
+        {
+          "id": "agt_def456"
+        }
+      ]
+    }
+    ```
+
+  </Col>
+</Row>

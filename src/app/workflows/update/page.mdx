@@ -1,0 +1,79 @@
+# Update a workflow {{ tag: 'PUT', label: '/v1/workflows/:id' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to perform an update on a workflow. You can update the steps, configuration, and failure strategy.
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="name" type="string">
+        Updated name for the workflow.
+      </Property>
+      <Property name="description" type="string">
+        Updated description.
+      </Property>
+      <Property name="steps" type="array">
+        Updated list of step definitions.
+      </Property>
+      <Property name="timeout" type="integer">
+        Updated maximum execution time.
+      </Property>
+      <Property name="max_retries" type="integer">
+        Updated retry count for failed steps.
+      </Property>
+      <Property name="on_failure" type="string">
+        Updated failure strategy.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="PUT" label="/v1/workflows/:id">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X PUT http://localhost:8000/v1/workflows/wfl_abc123 \
+      -H "Authorization: Bearer {token}" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "timeout": 900,
+        "max_retries": 3
+      }'
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    workflow = client.workflows.update("wfl_abc123",
+        timeout=900,
+        max_retries=3,
+    )
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "id": "wfl_abc123",
+      "name": "content-pipeline",
+      "description": "Research, write, and review content.",
+      "steps": [
+        {"agent": "researcher", "task": "Research the topic"},
+        {"agent": "writer", "task": "Write a draft", "depends_on": "researcher"},
+        {"agent": "reviewer", "task": "Review the draft", "depends_on": "writer"}
+      ],
+      "timeout": 900,
+      "max_retries": 3,
+      "on_failure": "abort",
+      "status": "active",
+      "created_at": "2026-02-21T10:00:00Z",
+      "updated_at": "2026-02-22T14:30:00Z"
+    }
+    ```
+
+  </Col>
+</Row>

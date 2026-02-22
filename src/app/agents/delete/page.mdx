@@ -1,0 +1,29 @@
+# Delete an agent {{ tag: 'DELETE', label: '/v1/agents/:id' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to delete an agent. Note: this will permanently delete the agent and cancel any running tasks assigned to it.
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="DELETE" label="/v1/agents/:id">
+
+    ```bash {{ title: 'cURL' }}
+    curl -X DELETE http://localhost:8000/v1/agents/agt_abc123 \
+      -H "Authorization: Bearer {token}"
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    client.agents.delete("agt_abc123")
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>

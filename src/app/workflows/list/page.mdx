@@ -1,0 +1,71 @@
+# List all workflows {{ tag: 'GET', label: '/v1/workflows' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retrieve a paginated list of all your workflows. By default, a maximum of twenty workflows are shown per page.
+
+    ### Optional attributes
+
+    <Properties>
+      <Property name="limit" type="integer">
+        Limit the number of workflows returned. Defaults to `20`.
+      </Property>
+      <Property name="offset" type="integer">
+        Number of workflows to skip for pagination.
+      </Property>
+      <Property name="status" type="string">
+        Filter workflows by status: `"active"` or `"inactive"`.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/v1/workflows">
+
+    ```bash {{ title: 'cURL' }}
+    curl -G http://localhost:8000/v1/workflows \
+      -H "Authorization: Bearer {token}" \
+      -d limit=10
+    ```
+
+    ```python {{ title: 'Python' }}
+    from agentflow import AgentFlowClient
+
+    client = AgentFlowClient(token)
+
+    workflows = client.workflows.list(limit=10)
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "has_more": false,
+      "data": [
+        {
+          "id": "wfl_abc123",
+          "name": "content-pipeline",
+          "description": "Research, write, and review content.",
+          "steps": [
+            {"agent": "researcher", "task": "Research the topic"},
+            {"agent": "writer", "task": "Write a draft", "depends_on": "researcher"},
+            {"agent": "reviewer", "task": "Review the draft", "depends_on": "writer"}
+          ],
+          "timeout": 600,
+          "max_retries": 2,
+          "on_failure": "abort",
+          "status": "active",
+          "created_at": "2026-02-21T10:00:00Z",
+          "updated_at": "2026-02-21T10:00:00Z"
+        },
+        {
+          "id": "wfl_def456"
+        }
+      ]
+    }
+    ```
+
+  </Col>
+</Row>

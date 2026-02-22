@@ -1,25 +1,24 @@
 import clsx from 'clsx'
 
-export function Prose({
-  children,
+export function Prose<T extends React.ElementType = 'div'>({
+  as,
   className,
-}: {
-  children: React.ReactNode
+  ...props
+}: Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'className'> & {
+  as?: T
   className?: string
 }) {
+  let Component = as ?? 'div'
+
   return (
-    <div
+    <Component
       className={clsx(
-        'prose prose-zinc dark:prose-invert mx-auto max-w-3xl',
-        'prose-headings:font-semibold',
-        'prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:text-emerald-500',
-        'dark:prose-a:text-emerald-400 dark:hover:prose-a:text-emerald-300',
-        'prose-code:rounded prose-code:bg-zinc-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:font-medium',
-        'dark:prose-code:bg-zinc-800',
         className,
+        'prose dark:prose-invert',
+        // `html :where(& > *)` is used to select all direct children without an increase in specificity like you'd get from just `& > *`
+        '[html_:where(&>*)]:mx-auto [html_:where(&>*)]:max-w-2xl lg:[html_:where(&>*)]:mx-[calc(50%-min(50%,var(--container-lg)))] lg:[html_:where(&>*)]:max-w-3xl',
       )}
-    >
-      {children}
-    </div>
+      {...props}
+    />
   )
 }

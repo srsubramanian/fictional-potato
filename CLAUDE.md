@@ -45,4 +45,4 @@ tsconfig.json        # TypeScript config
 
 ## Reference Template (`tmp/protocol-ts/`)
 
-The `tmp/` directory contains a reference Tailwind Plus template (not part of the project). It demonstrates advanced patterns we may adopt later: FlexSearch, Shiki highlighting, Zustand, Headless UI, Framer Motion, custom remark/rehype plugins.
+The `tmp/` directory contains a reference template (not part of the project). It demonstrates advanced patterns: FlexSearch, Shiki highlighting, Zustand, Headless UI, Framer Motion, custom remark/rehype plugins.

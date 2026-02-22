@@ -1,130 +1,41 @@
+export const metadata = {
+  title: 'Authentication',
+  description:
+    'In this guide, we\'ll look at how authentication works. Protocol offers two ways to authenticate your API requests: Basic authentication and OAuth2 with a token.',
+}
+
 # Authentication
 
-AgentFlow supports API key and JWT-based authentication to secure your endpoints. This page covers setup, middleware configuration, and best practices.
+You'll need to authenticate your requests to access any of the endpoints in the Protocol API. In this guide, we'll look at how authentication works. Protocol offers two ways to authenticate your API requests: Basic authentication and OAuth2 with a token — OAuth2 is the recommended way. {{ className: 'lead' }}
 
-## Authentication Methods
+## Basic authentication
 
-| Method | Use Case | Complexity |
-|--------|----------|------------|
-| API Key | Server-to-server calls, CLI tools | Simple |
-| JWT Token | Frontend clients, user-scoped access | Moderate |
+With basic authentication, you use your username and password to authenticate your HTTP requests. Unless you have a very good reason, you probably shouldn't use basic auth. Here's how to authenticate using cURL:
 
-## API Key Authentication
-
-API keys are the simplest way to authenticate. Generate a key and pass it in the `Authorization` header.
-
-### Generate a Key
-
-```bash
-agentflow auth create-key --name "my-service" --scopes "workflows:run,tasks:read"
+```bash {{ title: 'Example request with basic auth' }}
+curl https://api.protocol.chat/v1/conversations \
+  -u username:password
 ```
 
-Output:
+Please don't commit your Protocol password to GitHub!
 
-```text
-API Key: af_sk_live_abc123def456...
-Scopes: workflows:run, tasks:read
-Created: 2026-02-21T10:00:00Z
+## OAuth2 with bearer token
+
+The recommended way to authenticate with the Protocol API is by using OAuth2. When establishing a connection using OAuth2, you will need your access token — you will find it in the [Protocol dashboard](#) under API settings. Here's how to add the token to the request header using cURL:
+
+```bash {{ title: 'Example request with bearer token' }}
+curl https://api.protocol.chat/v1/conversations \
+  -H "Authorization: Bearer {token}"
 ```
 
-### Use the Key
+Always keep your token safe and reset it if you suspect it has been compromised.
 
-Include the key in your API requests:
+## Using an SDK
 
-```bash
-curl -H "Authorization: Bearer af_sk_live_abc123def456" \
-  http://localhost:8000/api/workflows
-```
+If you use one of our official SDKs, you won't have to worry about any of the above — fetch your access token from the [Protocol dashboard](#) under API settings, and the client library will take care of the rest. All the client libraries use OAuth2 behind the scenes.
 
-Or in Python:
-
-```python title="client.py"
-import httpx
-
-client = httpx.AsyncClient(
-    base_url="http://localhost:8000/api",
-    headers={"Authorization": "Bearer af_sk_live_abc123def456"},
-)
-
-response = await client.get("/workflows")
-```
-
-## JWT Authentication
-
-For frontend clients, use JWT tokens to authenticate users with scoped permissions.
-
-### Configure the JWT Provider
-
-Set up the JWT middleware in `agentflow.config.yaml`:
-
-```yaml title="agentflow.config.yaml"
-auth:
-  jwt:
-    issuer: https://auth.example.com
-    audience: agentflow-api
-    algorithms:
-      - RS256
-    jwks_uri: https://auth.example.com/.well-known/jwks.json
-```
-
-### Middleware Setup
-
-The authentication middleware validates tokens and attaches user context to each request:
-
-```python title="server.py" {4-8,12}
-from agentflow.auth import JWTMiddleware, require_scope
-
-# Applied globally in the API server
-app.add_middleware(
-    JWTMiddleware,
-    issuer="https://auth.example.com",
-    audience="agentflow-api",
-)
-
-# Require specific scopes on individual routes
-@app.get("/api/admin/users")
-@require_scope("admin:read")
-async def list_users(request: Request):
-    user = request.state.user
-    return await get_users(org_id=user.org_id)
-```
-
-### Token Structure
-
-AgentFlow expects JWTs with the following claims:
-
-```json
-{
-  "sub": "user_123",
-  "org_id": "org_456",
-  "scopes": ["workflows:run", "tasks:read", "agents:read"],
-  "iat": 1740100000,
-  "exp": 1740103600
-}
-```
-
-## Scopes Reference
-
-| Scope | Description |
-|-------|-------------|
-| `workflows:run` | Execute workflow runs |
-| `workflows:read` | List and inspect workflows |
-| `workflows:write` | Create and modify workflows |
-| `tasks:read` | Read task status and results |
-| `agents:read` | List and inspect agents |
-| `agents:write` | Create and modify agents |
-| `webhooks:manage` | Create and delete webhooks |
-| `admin:read` | Read admin-level resources |
-
-## Best Practices
-
-- **Rotate keys regularly** — Use `agentflow auth rotate-key` to rotate API keys without downtime
-- **Use least-privilege scopes** — Grant only the scopes each client needs
-- **Store secrets securely** — Use environment variables or a secrets manager, never hard-code keys
-- **Enable HTTPS** — Always use TLS in production to protect tokens in transit
-
-## Next Steps
-
-- Explore the [Agents](/agents) API to define intelligent workers
-- Build [Workflows](/workflows) to chain agents together
-- Set up [Webhooks](/webhooks) for event-driven integrations
+<div className="not-prose">
+  <Button href="/sdks" variant="text" arrow="right">
+    <>Check out our list of first-party SDKs</>
+  </Button>
+</div>
