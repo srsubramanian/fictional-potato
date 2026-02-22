@@ -3,3 +3,29 @@
 Workflows orchestrate multiple agents into directed acyclic graphs (DAGs). They define execution order, dependencies, and conditional branching. {{ className: 'lead' }}
 
 Each workflow is composed of steps that reference agents and tasks. You can configure timeouts, retry policies, and failure strategies. Use the endpoints below to create, manage, and run workflows programmatically.
+
+## Workflow execution flow
+
+```mermaid
+graph TD
+    A[🚀 Submit Workflow]:::submit --> B[Initialize Steps]:::init
+    B --> C{Parallel or Sequential?}:::decision
+    C -->|Sequential| D[Run Step 1]:::step
+    D --> E[Run Step 2]:::step
+    E --> F[Run Step N]:::step
+    C -->|Parallel| G[Run All Steps]:::parallel
+    F --> H{All Succeeded?}:::decision
+    G --> H
+    H -->|Yes| I[✅ Return Results]:::success
+    H -->|No| J{Retry Policy?}:::decision
+    J -->|Retry| D
+    J -->|Fail| K[❌ Return Error]:::error
+
+    classDef submit fill:#6366f1,stroke:#4f46e5,color:#fff
+    classDef init fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef decision fill:#f59e0b,stroke:#d97706,color:#fff
+    classDef step fill:#3b82f6,stroke:#2563eb,color:#fff
+    classDef parallel fill:#06b6d4,stroke:#0891b2,color:#fff
+    classDef success fill:#10b981,stroke:#059669,color:#fff
+    classDef error fill:#ef4444,stroke:#dc2626,color:#fff
+```

@@ -13,6 +13,7 @@ import {
 } from 'react'
 import { create } from 'zustand'
 
+import { Mermaid } from '@/components/Mermaid'
 import { Tag } from '@/components/Tag'
 
 const languageNames: Record<string, string> = {
@@ -376,11 +377,18 @@ export function Code({
 export function Pre({
   children,
   ...props
-}: React.ComponentPropsWithoutRef<typeof CodeGroup>) {
+}: React.ComponentPropsWithoutRef<typeof CodeGroup> & {
+  language?: string
+  code?: string
+}) {
   let isGrouped = useContext(CodeGroupContext)
 
   if (isGrouped) {
     return children
+  }
+
+  if (props.language === 'mermaid' && props.code) {
+    return <Mermaid code={props.code} />
   }
 
   return <CodeGroup {...props}>{children}</CodeGroup>
