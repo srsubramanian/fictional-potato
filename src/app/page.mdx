@@ -1,3 +1,32 @@
-# AgentFlow Docs
+# Introduction
 
-**Coming Soon** — Documentation for AgentFlow, a React + FastAPI agentic workflow builder.
+Welcome to **AgentFlow** — a framework for building agentic workflows with React and FastAPI.
+
+AgentFlow lets you compose intelligent agents that collaborate, delegate tasks, and orchestrate complex multi-step processes. Define your agents in Python, wire them together as workflows, and control everything from a React frontend.
+
+## Key Features
+
+- **Agent Composition** — Build agents with tools, memory, and planning capabilities
+- **Workflow Engine** — Chain agents into directed graphs with conditional branching
+- **Task Queue** — Async task execution with progress tracking and retries
+- **Webhook Integration** — Trigger workflows from external events
+- **Type-Safe API** — Full TypeScript client generated from the FastAPI schema
+
+## Quick Example
+
+```python
+from agentflow import Agent, Workflow
+
+researcher = Agent("researcher", tools=[search, summarize])
+writer = Agent("writer", tools=[draft, edit])
+
+workflow = Workflow("blog-pipeline")
+workflow.add_step(researcher, task="Research the topic")
+workflow.add_step(writer, task="Write a blog post", depends_on=researcher)
+
+result = await workflow.run(topic="AI Agents in 2026")
+```
+
+## Next Steps
+
+Read the [Quickstart](/quickstart) guide to set up your first workflow in under five minutes, or explore the [Architecture](/architecture) overview to understand how the pieces fit together.
